@@ -1,6 +1,9 @@
+import { useState,useEffect } from "react";
 import styled from "@emotion/styled";
+import Error from "./Error";
 import { monedas } from "../data/monedas";
 import useSelectMonedas from "../hooks/useSelectMonedas";
+
 
 const InputSubmit = styled.input`
   background-color: #9497ff;
@@ -19,13 +22,51 @@ const InputSubmit = styled.input`
     cursor: pointer;
   }
 `;
-export default function Formulario() {
-  const [SelectMonedas] = useSelectMonedas("Elige tu Moneda", monedas);
+export default function Formulario({setMonedas}) {
+  const [criptos, setCriptos] = useState([])
+  const [error, setError] = useState(false)
+  const [moneda, SelectMonedas] = useSelectMonedas("Elige tu Moneda", monedas);
+  const [criptomoneda, SelectCriptomoneda] = useSelectMonedas("Elige tu Criptomoneda",criptos);
 
+  useEffect(() => {
+    const consultarApi = async () => {
+      const url =
+        "https://min-api.cryptocompare.com/data/top/mktcapfull?limit=10&tsym=USD";
+      const respuesta = await fetch(url);
+      const resultado = await respuesta.json();
+
+      const arrayCriptos = resultado.Data.map((cripto) => {
+        const objeto = {
+          id: cripto.CoinInfo.Name,
+          nombre: cripto.CoinInfo.FullName,
+        };
+        return objeto;
+      });
+      setCriptos(arrayCriptos);
+    };
+    consultarApi();
+  }, []);
+
+function handleSubmit(e){
+  e.preventDefault()
+  if ([moneda, criptomoneda].includes("")) {
+    setError(true)
+    return
+  }
+  setError(false)
+  setMonedas({
+    moneda, criptomoneda
+  })
+}
   return (
-    <form>
-      <SelectMonedas />
-      <InputSubmit type="submit" value="Cotizar" />
-    </form>
+    <>
+      {error && <Error>Todos los campos son obligatorios</Error>}
+      <form onSubmit={handleSubmit}>
+        <SelectMonedas />
+        {/* {moneda} */}
+        <SelectCriptomoneda />
+        <InputSubmit type="submit" value="Cotizar" />
+      </form>
+    </>
   );
 }
