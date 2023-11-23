@@ -1,3 +1,5 @@
 # Cotizador de Criptomonedas
 
-### Podrás o bien acceder desde mi portfolio para que vayas directo o bien te lo puedes descargar y acceder mediante npm run dev
+## Para acceder bien puedes hacerlo a través de mi Portfolio (donde te lleva a la demo) o te lo puedes clonar:
+### npm install
+### npm rud dev
